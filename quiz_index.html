@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mito ou Verdade? · Instituto Óptima</title>
+<meta name="description" content="Quiz educativo: teste o que você sabe sobre os mitos mais comuns da saúde dos olhos. Instituto Óptima Medicina e Saúde · Caruaru-PE.">
+<meta property="og:title" content="Mito ou Verdade? Saúde dos olhos">
+<meta property="og:description" content="Cenoura melhora a visão? Óculos vicia? Descubra quantos mitos te enganam — quiz educativo do Instituto Óptima.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0C293E;
+  --navy-soft:#16405F;
+  --green:#64A354;
+  --green-deep:#4C7F3F;
+  --green-pale:#EFF5EC;
+  --rust:#C46B4E;
+  --rust-pale:#F8EEE9;
+  --paper:#FAFBF8;
+  --card:#FFFFFF;
+  --gray:#8D8E92;
+  --line:rgba(12,41,62,.12);
+  --font-display:'Fraunces',serif;
+  --font-ui:'Hanken Grotesk',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:var(--font-ui);
+  background:var(--paper);color:var(--navy);
+  position:fixed;inset:0;overflow:hidden;
+}
+button{font-family:var(--font-ui);border:none;background:none;color:inherit;cursor:pointer}
+.screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:max(env(safe-area-inset-top),20px) 22px max(env(safe-area-inset-bottom),22px);
+  overflow-y:auto;
+  opacity:0;visibility:hidden;transition:opacity .35s,visibility .35s;
+}
+.screen.on{opacity:1;visibility:visible}
+@media (min-width:760px){
+  .screen{max-width:480px;left:50%;transform:translateX(-50%)}
+}
+
+/* ---------- capa ---------- */
+.arc{
+  position:absolute;top:-34vw;left:50%;transform:translateX(-50%);
+  width:150vw;height:75vw;max-width:900px;max-height:450px;
+  border-radius:0 0 150vw 150vw;
+  background:radial-gradient(ellipse at 50% 0%, rgba(100,163,84,.22), rgba(100,163,84,.04) 60%, transparent 75%);
+  pointer-events:none;
+}
+.eyebrow{
+  font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:14px;
+}
+#coverBody{position:relative;margin:auto 0;padding-top:12vh}
+#coverBody h1{
+  font-family:var(--font-display);font-weight:600;
+  font-size:clamp(36px,10vw,54px);line-height:1.06;letter-spacing:-.01em;
+  margin-bottom:16px;
+}
+#coverBody h1 em{font-style:italic;color:var(--green)}
+#coverBody p{font-size:16px;line-height:1.55;color:#3A4650;max-width:32ch;margin-bottom:32px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:17px 20px;border-radius:999px;
+  font-size:16px;font-weight:700;
+  transition:transform .12s ease;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--navy);color:var(--paper)}
+.cover-foot{
+  position:relative;margin-top:32px;font-size:11.5px;line-height:1.6;color:var(--gray);
+}
+.cover-foot strong{color:var(--navy);font-weight:600}
+
+/* ---------- jogo ---------- */
+#topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+#progressTxt{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--gray)}
+#scoreTxt{font-size:13px;font-weight:700;color:var(--green-deep)}
+#bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:26px}
+#barFill{height:100%;width:0;background:var(--green);border-radius:3px;transition:width .35s ease}
+.q-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green-deep);margin-bottom:10px;
+}
+#statement{
+  font-family:var(--font-display);font-weight:500;
+  font-size:clamp(23px,6.4vw,30px);line-height:1.22;
+  min-height:5.2em;
+}
+#answers{display:flex;gap:12px;margin-top:auto;padding-top:24px}
+.ans{
+  flex:1;padding:20px 10px;border-radius:18px;
+  font-size:17px;font-weight:700;letter-spacing:.04em;
+  border:2px solid var(--navy);color:var(--navy);background:var(--card);
+  transition:transform .1s;
+}
+.ans:active{transform:scale(.97)}
+.ans:disabled{opacity:.35}
+
+/* feedback */
+#feedback{
+  position:absolute;left:0;right:0;bottom:0;
+  background:var(--card);
+  border-radius:24px 24px 0 0;
+  box-shadow:0 -8px 40px rgba(12,41,62,.18);
+  padding:22px 22px calc(max(env(safe-area-inset-bottom),18px) + 6px);
+  transform:translateY(105%);transition:transform .32s cubic-bezier(.3,.9,.3,1);
+}
+@media (min-width:760px){#feedback{max-width:480px;left:50%;margin-left:-240px}}
+#feedback.show{transform:translateY(0)}
+#fbBadge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 14px;border-radius:999px;margin-bottom:12px;
+}
+#feedback.ok #fbBadge{background:var(--green-pale);color:var(--green-deep)}
+#feedback.err #fbBadge{background:var(--rust-pale);color:var(--rust)}
+#fbVerdict{
+  font-family:var(--font-display);font-size:21px;font-weight:600;margin-bottom:8px;
+}
+#fbText{font-size:15px;line-height:1.55;color:#3A4650;margin-bottom:18px}
+#nextBtn{width:100%;padding:16px;border-radius:999px;background:var(--navy);color:var(--paper);font-size:16px;font-weight:700}
+
+/* ---------- resultado ---------- */
+#resultCard{
+  position:relative;background:var(--navy);color:var(--paper);
+  border-radius:24px;padding:34px 26px 28px;text-align:center;
+  margin:auto 0;overflow:hidden;
+}
+#resultCard .arc2{
+  position:absolute;top:-90px;left:50%;transform:translateX(-50%);
+  width:420px;height:210px;border-radius:0 0 420px 420px;
+  background:radial-gradient(ellipse at 50% 0%, rgba(100,163,84,.4), transparent 70%);
+}
+#resultCard .eyebrow{color:var(--green);position:relative}
+#bigScore{
+  position:relative;font-family:var(--font-display);font-weight:700;
+  font-size:76px;line-height:1;margin:6px 0 2px;
+}
+#bigScore small{font-size:26px;font-weight:600;color:rgba(250,251,248,.65)}
+#resultTitle{
+  position:relative;font-family:var(--font-display);font-style:italic;font-weight:600;
+  font-size:24px;color:var(--green);margin-bottom:10px;
+}
+#resultMsg{position:relative;font-size:14.5px;line-height:1.55;color:rgba(250,251,248,.85);max-width:30ch;margin:0 auto}
+#resultBrand{
+  position:relative;margin-top:22px;padding-top:16px;
+  border-top:1px solid rgba(250,251,248,.16);
+  font-size:10.5px;line-height:1.6;color:rgba(250,251,248,.55);
+}
+#resultBrand b{color:rgba(250,251,248,.85)}
+.result-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.btn-share{background:var(--green);color:var(--navy)}
+.btn-wa{
+  background:var(--card);color:var(--navy);border:2px solid var(--navy);
+  text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px 20px;border-radius:999px;font-size:15.5px;font-weight:700;
+}
+.btn-again{background:none;color:var(--navy);font-size:15px;font-weight:700;padding:12px;text-decoration:underline}
+.result-disclaimer{
+  text-align:center;font-size:11px;line-height:1.55;color:var(--gray);margin-top:14px;
+}
+#toast{
+  position:absolute;left:50%;bottom:110px;transform:translateX(-50%);
+  background:var(--navy);color:var(--paper);
+  font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:999px;
+  box-shadow:0 6px 24px rgba(12,41,62,.3);
+  opacity:0;pointer-events:none;transition:opacity .25s;z-index:70;white-space:nowrap;
+}
+#toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<section class="screen on" id="scrCover">
+  <div class="arc"></div>
+  <div id="coverBody">
+    <div class="eyebrow">Quiz · Saúde dos olhos</div>
+    <h1>Mito ou <em>verdade</em>?</h1>
+    <p>Cenoura melhora a visão? Óculos vicia? Descubra quantos mitos sobre os olhos ainda te enganam — são 8 perguntas rápidas.</p>
+    <button class="btn btn-primary" id="btnStart">Começar</button>
+  </div>
+  <div class="cover-foot">
+    <strong>Instituto Óptima Medicina e Saúde</strong> · Caruaru-PE<br>
+    Dr. Israel Neiva, médico · CRM-PE 22444<br><br>
+    Jogo educativo. Não substitui consulta médica.
+  </div>
+</section>
+
+<!-- JOGO -->
+<section class="screen" id="scrGame">
+  <div id="topbar">
+    <span id="progressTxt">1 / 8</span>
+    <span id="scoreTxt">0 acertos</span>
+  </div>
+  <div id="bar"><div id="barFill"></div></div>
+  <div class="q-eyebrow">Mito ou verdade?</div>
+  <p id="statement"></p>
+  <div id="answers">
+    <button class="ans" id="btnMito">MITO</button>
+    <button class="ans" id="btnVerdade">VERDADE</button>
+  </div>
+
+  <div id="feedback">
+    <span id="fbBadge"></span>
+    <div id="fbVerdict"></div>
+    <p id="fbText"></p>
+    <button id="nextBtn">Próxima</button>
+  </div>
+</section>
+
+<!-- RESULTADO -->
+<section class="screen" id="scrResult">
+  <div id="resultCard">
+    <div class="arc2"></div>
+    <div class="eyebrow">Seu resultado</div>
+    <div id="bigScore">0<small>/8</small></div>
+    <div id="resultTitle"></div>
+    <p id="resultMsg"></p>
+    <div id="resultBrand">
+      <b>Instituto Óptima Medicina e Saúde</b> · Caruaru-PE<br>
+      Dr. Israel Neiva, médico · CRM-PE 22444 · (81) 99889-7777
+    </div>
+  </div>
+  <div class="result-actions">
+    <button class="btn btn-share" id="btnShare">Desafiar um amigo</button>
+    <a class="btn-wa" href="https://wa.me/5581998897777?text=Ol%C3%A1!%20Fiz%20o%20quiz%20do%20Instituto%20%C3%93ptima%20e%20gostaria%20de%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">Agendar avaliação no WhatsApp</a>
+    <button class="btn-again" id="btnAgain">Jogar de novo (perguntas novas)</button>
+  </div>
+  <p class="result-disclaimer">Conteúdo educativo — o resultado não avalia a sua saúde ocular.<br>Exames de rotina continuam sendo a única forma de cuidar da visão de verdade.</p>
+</section>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* verdade: true = a afirmação é VERDADE; false = é MITO */
+  var BANK = [
+    { t:"Ler com pouca luz estraga a visão para sempre.", v:false,
+      e:"Ler no escuro cansa os olhos e pode dar dor de cabeça, mas o desconforto é temporário — não causa dano permanente." },
+    { t:"Comer cenoura melhora a visão.", v:false,
+      e:"A vitamina A é importante para a retina, mas comer mais cenoura não melhora a visão de quem já se alimenta normalmente. O excesso não vira \u201cvisão extra\u201d." },
+    { t:"Usar óculos \u201cvicia\u201d e enfraquece o olho.", v:false,
+      e:"Óculos apenas corrigem o foco. A sensação de \u201cdependência\u201d aparece porque a pessoa descobre como é enxergar bem — e não quer mais voltar atrás." },
+    { t:"Criança que assiste TV muito de perto pode estar com miopia.", v:true,
+      e:"Chegar perto da TV não causa miopia, mas pode ser um sinal de que a criança já não enxerga bem de longe. Vale investigar." },
+    { t:"O sol forte pode contribuir para a catarata.", v:true,
+      e:"A radiação UV acumulada ao longo da vida é fator de risco para catarata. No nosso sol do agreste, óculos com proteção UV e chapéu fazem diferença." },
+    { t:"O glaucoma pode avançar por anos sem nenhum sintoma.", v:true,
+      e:"No início, o glaucoma não dói e não embaça. Quando a pessoa percebe, parte da visão já se perdeu — e não volta. Só o exame de rotina detecta a tempo." },
+    { t:"Colírio que \u201ctira a vermelhidão\u201d pode ser usado sempre que o olho irritar.", v:false,
+      e:"O uso repetido causa efeito rebote (o olho fica mais vermelho ainda) e pode esconder um problema real. Vermelhidão que insiste merece avaliação." },
+    { t:"Diabetes pode causar cegueira.", v:true,
+      e:"A retinopatia diabética é uma das principais causas de cegueira evitável. Controlar a glicemia e examinar o fundo do olho regularmente protege a visão." },
+    { t:"Pingar chá, limão ou leite materno no olho ajuda a limpar e tratar irritações.", v:false,
+      e:"Nenhum produto caseiro deve entrar no olho: o risco de infecção e queimadura é real. Para lavar, apenas soro fisiológico — e irritação persistente merece avaliação." },
+    { t:"Criança só precisa avaliar a visão se reclamar que enxerga mal.", v:false,
+      e:"Criança não sabe que enxerga \u201cerrado\u201d — ela nunca enxergou de outro jeito. Por isso a avaliação na idade escolar é importante mesmo sem queixa." },
+    { t:"Existe colírio que cura catarata.", v:false,
+      e:"Nenhum colírio tem eficácia comprovada contra catarata. O tratamento é cirúrgico: troca-se a lente opaca por uma artificial — procedimento seguro e bem estabelecido." },
+    { t:"Passar o dia em telas causa dano permanente nos olhos de adultos.", v:false,
+      e:"Telas causam fadiga visual e olho seco (piscamos menos), mas não dano permanente em adultos. Pausas ajudam: a cada 20 minutos, olhe 20 segundos para longe." },
+    { t:"Passar aliança de ouro cura terçol.", v:false,
+      e:"O que ajuda no terçol é o calor da compressa morna — o ouro não tem efeito nenhum. Se não melhorar em alguns dias, procure avaliação." },
+    { t:"Dormir com lente de contato aumenta o risco de infecção grave na córnea.", v:true,
+      e:"Dormir de lente reduz a oxigenação da córnea e multiplica o risco de ceratite — infecção que pode deixar sequela. Tire as lentes antes de dormir, sempre." }
+  ];
+
+  var ROUND = 8;
+  var deck = [], idx = 0, score = 0;
+
+  var el = function(id){ return document.getElementById(id); };
+  var scrCover = el("scrCover"), scrGame = el("scrGame"), scrResult = el("scrResult");
+  var feedback = el("feedback"), toast = el("toast");
+  var toastTimer = null;
+
+  function shuffle(a){
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  function go(screen){
+    [scrCover,scrGame,scrResult].forEach(function(s){ s.classList.toggle("on", s===screen); });
+  }
+
+  function start(){
+    deck = shuffle(BANK.slice()).slice(0, ROUND);
+    idx = 0; score = 0;
+    feedback.classList.remove("show");
+    go(scrGame);
+    render();
+  }
+
+  function render(){
+    var q = deck[idx];
+    el("statement").textContent = q.t;
+    el("progressTxt").textContent = (idx+1) + " / " + ROUND;
+    el("scoreTxt").textContent = score + (score===1 ? " acerto" : " acertos");
+    el("barFill").style.width = (idx/ROUND*100) + "%";
+    el("btnMito").disabled = false;
+    el("btnVerdade").disabled = false;
+    feedback.classList.remove("show","ok","err");
+  }
+
+  function answer(saidVerdade){
+    var q = deck[idx];
+    var correct = (saidVerdade === q.v);
+    if(correct) score++;
+    el("btnMito").disabled = true;
+    el("btnVerdade").disabled = true;
+    el("scoreTxt").textContent = score + (score===1 ? " acerto" : " acertos");
+    el("fbBadge").textContent = correct ? "Você acertou" : "Não foi dessa vez";
+    el("fbVerdict").textContent = q.v ? "É verdade." : "É mito.";
+    el("fbText").textContent = q.e;
+    feedback.classList.add("show", correct ? "ok" : "err");
+    el("nextBtn").textContent = (idx === ROUND-1) ? "Ver resultado" : "Próxima";
+  }
+
+  function next(){
+    feedback.classList.remove("show");
+    if(idx === ROUND-1){ finish(); return; }
+    idx++;
+    setTimeout(render, 180);
+  }
+
+  function finish(){
+    el("barFill").style.width = "100%";
+    el("bigScore").innerHTML = score + "<small>/" + ROUND + "</small>";
+    var title, msg;
+    if(score === ROUND){ title = "Detetive dos mitos"; msg = "Nenhum mito te enganou. Desafie alguém da família — quase ninguém gabarita."; }
+    else if(score >= 6){ title = "Quase nada te engana"; msg = "Só " + (ROUND-score) + (ROUND-score===1?" mito passou":" mitos passaram") + ". Jogue de novo: as perguntas mudam."; }
+    else if(score >= 4){ title = "Alguns mitos ainda colam"; msg = "Você acertou mais da metade — mas alguns mitos famosos te pegaram. Vale rever as explicações."; }
+    else { title = "Os mitos venceram hoje"; msg = "Esses mitos enganam muita gente há gerações. Agora você já sabe a resposta — jogue de novo e vire o jogo."; }
+    el("resultTitle").textContent = title;
+    el("resultMsg").textContent = msg;
+    go(scrResult);
+  }
+
+  function share(){
+    var data = {
+      title: "Mito ou verdade? Saúde dos olhos",
+      text: "Fiz " + score + "/" + ROUND + " no quiz de mitos sobre os olhos do Instituto Óptima. Duvido você gabaritar:",
+      url: location.href
+    };
+    if(navigator.share){
+      navigator.share(data).catch(function(){});
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(data.text + " " + data.url).then(function(){
+        showToast("Link copiado!");
+      });
+    }
+  }
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove("show"); }, 2600);
+  }
+
+  el("btnStart").addEventListener("click", start);
+  el("btnMito").addEventListener("click", function(){ answer(false); });
+  el("btnVerdade").addEventListener("click", function(){ answer(true); });
+  el("nextBtn").addEventListener("click", next);
+  el("btnAgain").addEventListener("click", start);
+  el("btnShare").addEventListener("click", share);
+})();
+</script>
+</body>
+</html>
